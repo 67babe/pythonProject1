@@ -2,8 +2,27 @@ import cv2
 import numpy as np
 
 
+def solve_quad(a,b,c):
+    if a == 0:
+        print('您输入的不是二次方程!')
+    else:
+        delta = b*b-4*a*c
+        x = -b/(2*a)
+        if delta == 0:
+            print('方程有惟一解，X=%f'%(x))
+            return x
+        elif delta > 0:
+            x1 = x-np.sqrt(delta)/(2*a)
+            x2 = x+np.sqrt(delta)/(2*a)
+            print('方程有两个实根:X1=%f,X2=%f'%(x1,x2))
+            return x1,x2
+        else:
+            x1 = (-b+complex(0,1)*np.sqrt((-1)*delta))/(2*a)
+            x2 = (-b-complex(0,1)*np.sqrt((-1)*delta))/(2*a)
+            print('方程有两个虚根，如下所示：')
+            print(x1,x2)
+            return x1,x2
 
-#测试一下git
 def cv_show(name,img):
     cv2.imshow(name,img)
     cv2.waitKey(0)
@@ -51,7 +70,7 @@ print(xmid)
 ymid=max_loc[1]+template.shape[0]-max_loc[1]
 print(ymid)
 raw=img.copy()[max_loc[1]:max_loc[1]+template.shape[0],max_loc[0]:max_loc[0]+template.shape[1]]
-mres=img.copy()[max_loc[1]+(int)(ymid/8):max_loc[1]+template.shape[0]-(int)(ymid/8),max_loc[0]+(int)(xmid/4):max_loc[0]+template.shape[1]-(int)(xmid/4)]
+mres=img.copy()[max_loc[1]+(int)(ymid/8):max_loc[1]+template.shape[0]-(int)(ymid/8),max_loc[0]+(int)(xmid/3):max_loc[0]+template.shape[1]-(int)(xmid/3)]
 print("模式匹配")
 print(mres)
 cv_show("mres",mres)
@@ -154,9 +173,9 @@ print("C线图像转化为灰度图")
 cv_show('img',roi1_gray)
 
 #计算标C灰度图平均灰度值和方差
-avg1=cvAvg(roi1_gray)
+avgC=cvAvg(roi1_gray)
 variance=Variance(roi1_gray)
-print("平均灰度值为",avg1)
+print("平均灰度值为",avgC)
 print("方差为",variance)
 
 #T线轮廓矩形
@@ -176,20 +195,22 @@ roi2_gray=cv2.cvtColor(roi2.copy(),cv2.COLOR_BGR2GRAY)
 print("T线灰度图")
 cv_show('img',roi2_gray)
 
-avg2=cvAvg(roi2_gray)
+avgT=cvAvg(roi2_gray)
 variance2=Variance(roi2_gray)
-print("平均灰度值为",avg2)
+print("平均灰度值为",avgT)
 print("方差为",variance2)
 
-rate=avg1/avg2
+rate=avgC/avgT
 print("灰度的比值为",rate)
 
-result=avg1/(avg2+avg1)
-print("",result)
+result=(255-avgT)/((255-avgT)+(255-avgC))
+print("T/(T+C)=",result)
 
 a=-0.0014
 b=0.0603
 c=0.1323-result
 p=np.poly1d([a,b,c])
+x1,x2=solve_quad(a,b,c)
+print("x1=",x1,"x2=",x2)
 print(p.r)
 
