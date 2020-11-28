@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-#试试git 再试试
+#试试git 再试试——仔试试
 def solve_quad(a,b,c):
     if a == 0:
         print('您输入的不是二次方程!')
