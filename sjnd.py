@@ -16,7 +16,7 @@ def cvAvg(img):
     return sum/(len(img)*len(img[0]))
 
 img=cv2.imread('img/sj.jpg')
-img2=cv2.imread('img/32.jpg')
+img2=cv2.imread('img/shizhi.jpg')
 # hsv=cv2.cvtColor(img2,cv2.COLOR_BGR2HSV_FULL)
 # h,s,v=cv2.split(hsv)
 # ret, h1 = cv2.threshold(h, 235, 255, cv2.THRESH_BINARY)
