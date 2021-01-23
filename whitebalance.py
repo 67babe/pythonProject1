@@ -8,10 +8,10 @@ def cv_show(name,img):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-stdv=185.6765734265734
+stdv=(220/255)**(0.45)
 
 #二值化
-img=cv2.imread('img/1std359.jpg')
+img=cv2.imread('img/std175.jpg')
 
 img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 cv_show('img',img_gray)
@@ -35,6 +35,7 @@ cv2.destroyAllWindows()
 border=cv2.Canny(closing,45,50)
 cv_show('img',closing)
 
+#图片旋转
 linelist=[]
 
 lines = cv2.HoughLinesP(border, 0.8, np.pi / 720, 20,minLineLength=50, maxLineGap=20)
@@ -112,17 +113,9 @@ tx2=tx+tw-(int)(tw/4)
 ty2=ty-(int)(th/3.5)+th
 imgc = cv2.rectangle(img.copy(),(tx1,ty1),(tx2,ty2),(0,255,0),1)
 print("T线轮廓矩形")
-cv_show('img',img)
+cv_show('img',imgc)
 
-#T线分割
-roi2=img.copy()[ty1:ty2,tx1:tx2]
-print("T线分割")
-cv_show('img',roi2)
 
-#T线图像转灰度图
-roi2_gray=cv2.cvtColor(roi2.copy(),cv2.COLOR_BGR2GRAY)
-print("T线灰度图")
-cv_show('img',roi2_gray)
 
 
 #C线轮廓矩形
@@ -136,59 +129,125 @@ imgc = cv2.rectangle(imgc.copy(),(cx1,cy1),(cx2,cy2),(0,255,0),1)
 print("C线轮廓矩形")
 cv_show('img',imgc)
 
+
+
+
+#w1区域
+w1x=tx
+w1y=ty2+(int)((th)/3)
+w1h=th
+w1w=tw
+
+w1x1=cx1
+w1y1=w1y
+w1x2=cx2
+w1y2=w1y1+cy2-cy1
+
+imgc = cv2.rectangle(imgc.copy(),(w1x1,w1y1),(w1x2,w1y2),(0,255,0),1)
+print("w1区域轮廓矩形")
+cv_show('img',imgc)
+roiw=img.copy()[w1y1:w1y2,w1x1:w1x2]
+print("w区域分割")
+cv_show('img',roiw)
+
+#白平衡
+wb,wg,wr=cv2.split(roiw)
+avgwb=zdyf.cvAvg(wb)
+avgwg=zdyf.cvAvg(wg)
+avgwr=zdyf.cvAvg(wr)
+k=(avgwb+avgwr+avgwg)/3
+kb=k/avgwb
+kg=k/avgwg
+kr=k/avgwr
+imgb,imgg,imgr=cv2.split(img)
+cv2.addWeighted(imgb,kb,0,0,0,imgb)
+cv2.addWeighted(imgg,kg,0,0,0,imgg)
+cv2.addWeighted(imgr,kr,0,0,0,imgr)
+img=cv2.merge((imgb,imgg,imgr))
+cv_show("img",img)
+roiw=img.copy()[w1y1:w1y2,w1x1:w1x2]
+roiw_gray=cv2.cvtColor(roiw,cv2.COLOR_BGR2GRAY)
+avgW=zdyf.cvAvg(roiw_gray)
+print("W灰度为",avgW)
+
+
+#w2区域
+w2x=tx
+w2y=cy1-(int)((th)/2.3)-cy2+cy1
+w2h=th
+w2w=tw
+
+w2x1=cx1
+w2y1=w2y
+w2x2=cx2
+w2y2=w2y1+cy2-cy1
+
+imgc = cv2.rectangle(imgc.copy(),(w2x1,w2y1),(w2x2,w2y2),(0,255,0),1)
+print("w2区域轮廓矩形")
+cv_show('img',imgc)
+roiw2=img.copy()[w2y1:w2y2,w2x1:w2x2]
+print("w2区域分割")
+cv_show('img',roiw2)
+roiw2_gray=cv2.cvtColor(roiw2,cv2.COLOR_BGR2GRAY)
+avgW2=zdyf.cvAvg(roiw2_gray)
+print("W2灰度为",avgW2)
+adjT=avgW+(-avgW2+avgW)*0.5
+adjC=avgW2+(-avgW+avgW2)*0.5
+tb=stdv/((adjT/255)**(0.45))
+cb=stdv/((adjC/255)**(0.45))
+print("tb,tc 为",tb,cb)
+
+#T线分割
+roiT=img.copy()[ty1:ty2,tx1:tx2]
+print("T线分割")
+cv_show('img',roiT)
+
+#T线图像转灰度图
+roiT_gray=cv2.cvtColor(roiT.copy(),cv2.COLOR_BGR2GRAY)
+print("T线灰度图")
+cv_show('img',roiT_gray)
+
+#计算标T灰度图平均灰度值和方差
+avgT=zdyf.cvAvg(roiT_gray)
+variance=zdyf.Variance(roiT_gray)
+print("平均灰度值为",avgT)
+print("方差为",variance)
+
+
 #C线分割
-roi1=img.copy()[cy1:cy2,cx1:cx2]
+roiC=img.copy()[cy1:cy2,cx1:cx2]
 print("C线分割")
-cv_show('img',roi1)
+cv_show('img',roiC)
 
 #C线转灰度
-roi1_gray=cv2.cvtColor(roi1.copy(),cv2.COLOR_BGR2GRAY)
+roiC_gray=cv2.cvtColor(roiC.copy(),cv2.COLOR_BGR2GRAY)
 print("C线图像转化为灰度图")
-cv_show('img',roi1_gray)
-
+cv_show('img',roiC_gray)
 
 
 #计算标C灰度图平均灰度值和方差
-avgC=zdyf.cvAvg(roi1_gray)
-variance=zdyf.Variance(roi1_gray)
+avgC=zdyf.cvAvg(roiC_gray)
+variance=zdyf.Variance(roiC_gray)
 print("平均灰度值为",avgC)
 print("方差为",variance)
 
 
-#w区域
-wx=tx
-wy=(int)((cy+ty)/2)
-wh=th
-ww=tw
+#rT=math.log(190/255,adjT/255)
+rt=tb
+res_roiT=zdyf.gammaAdj(roiT_gray,tb)
+avgT=zdyf.cvAvg(res_roiT)
+print("T平均灰度值为",avgT)
 
-wx1=cx1
-wy1=(int)((cy1+ty1)/2)
-wx2=cx2
-wy2=wy1+cy2-cy1
+#rC=math.log(190/255,adjC/255)
+rC=cb
+res_roiC=zdyf.gammaAdj(roiC_gray,rC)
+avgC=zdyf.cvAvg(res_roiC)
+print("C平均灰度值为",avgC)
 
-imgc = cv2.rectangle(imgc.copy(),(wx1,wy1),(wx2,wy2),(0,255,0),1)
-print("w区域轮廓矩形")
-cv_show('img',imgc)
-roiw=img.copy()[wy1:wy2,wx1:wx2]
-print("w区域分割")
-cv_show('img',roiw)
-roiw_gray=cv2.cvtColor(roiw,cv2.COLOR_BGR2GRAY)
-avgW=zdyf.cvAvg(roiw_gray)
-print("W灰度为",avgW)
-roiwhsv=cv2.cvtColor(roiw,cv2.COLOR_BGR2HSV)
-roiwh,roiws,roiwv=cv2.split(roiwhsv)
-avgWh=zdyf.cvAvg(roiwv)
-print("w平均V分量",avgWh)
-
-
-avgT=zdyf.cvAvg(roi2_gray)
-variance2=zdyf.Variance(roi2_gray)
-print("平均灰度值为",avgT)
-print("方差为",variance2)
 
 rate=avgC/avgT
 print("灰度的比值为",rate)
-result=(avgW-avgT)/((avgW-avgT)+(avgW-avgC))
+result=(255-avgT)/((255-avgT)+(255-avgC))
 print("T/(T+C)=",result)
 
 # a=-0.0014

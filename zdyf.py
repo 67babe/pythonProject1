@@ -119,5 +119,5 @@ def takesecond(elem):
 def gammaAdj(img,r):
     for x in range(len(img)):
         for x2 in range(len(img[x])):
-            img[x][x2]=(int)((img[x][x2]/255)**r*255)
+            img[x][x2]=(int)((((img[x][x2]/255)**(0.45))*r)**(2.2)*255)
     return img

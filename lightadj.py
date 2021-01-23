@@ -11,7 +11,7 @@ def cv_show(name,img):
 stdv=185.6765734265734
 
 #二值化
-img=cv2.imread('img/std268.jpg')
+img=cv2.imread('img/2std77.jpg')
 
 img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 cv_show('img',img_gray)
@@ -195,7 +195,7 @@ cv_show('img',imgc)
 roiw2=img.copy()[w2y1:w2y2,w2x1:w2x2]
 print("w2区域分割")
 cv_show('img',roiw2)
-roiw_gray=cv2.cvtColor(roiw,cv2.COLOR_BGR2GRAY)
+roiw_gray=cv2.cvtColor(roiw2,cv2.COLOR_BGR2GRAY)
 avgW2=zdyf.cvAvg(roiw_gray)
 print("W2灰度为",avgW2)
 
