@@ -12,7 +12,7 @@ def cv_show(name,img):
 stdv=240
 
 #二值化
-img=cv2.imread('img/3std359.jpg')
+img=cv2.imread('img/std296.jpg')
 
 img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 cv_show('img',img_gray)
