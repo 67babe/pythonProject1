@@ -8,10 +8,11 @@ def cv_show(name,img):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-stdv=(220/255)**(0.45)
+#stdv=(220/255)**(0.45)
+stdv=240
 
 #二值化
-img=cv2.imread('img/std175.jpg')
+img=cv2.imread('img/3std359.jpg')
 
 img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 cv_show('img',img_gray)
@@ -38,7 +39,7 @@ cv_show('img',closing)
 #图片旋转
 linelist=[]
 
-lines = cv2.HoughLinesP(border, 0.8, np.pi / 720, 20,minLineLength=50, maxLineGap=20)
+lines = cv2.HoughLinesP(border, 0.8, np.pi / 720, 20,minLineLength=25, maxLineGap=20)
 for line in lines:
     x1, y1, x2, y2 = line[0]
     linelist.append([x1,y1,x2,y2])
@@ -191,10 +192,12 @@ cv_show('img',roiw2)
 roiw2_gray=cv2.cvtColor(roiw2,cv2.COLOR_BGR2GRAY)
 avgW2=zdyf.cvAvg(roiw2_gray)
 print("W2灰度为",avgW2)
-adjT=avgW+(-avgW2+avgW)*0.5
-adjC=avgW2+(-avgW+avgW2)*0.5
-tb=stdv/((adjT/255)**(0.45))
-cb=stdv/((adjC/255)**(0.45))
+adjT=avgW+(-avgW2+avgW)*0.4
+adjC=avgW2+(-avgW+avgW2)*0.4
+tb=stdv/adjT
+cb=stdv/adjC
+# tb=stdv/((adjT/255)**(0.45))
+# cb=stdv/((adjC/255)**(0.45))
 print("tb,tc 为",tb,cb)
 
 #T线分割
